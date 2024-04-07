@@ -4,14 +4,15 @@
 AS
 Begin
 	set nocount on;
-	WITH AvailableRooms AS (
-		SELECT Id FROM dbo.Rooms Ro
-		EXCEPT
-		SELECT RoomId FROM dbo.Bookings Bo
-		Where Bo.StartDate = @startDate and Bo.EndDate = @endDate)
-	SELECT DISTINCT RT.Id, RT.Title, RT.[Description], RT.Price
-	FROM AvailableRooms AR
-	LEFT JOIN dbo.Rooms R ON AR.Id = R.Id
-	LEFT JOIN dbo.RoomTypes RT ON R.RoomTypeId = RT.Id;
+	with AvailableRooms (Id) as 
+        (
+            select Id from dbo.Rooms
+            EXCEPT
+            Select RoomId from dbo.Bookings Bo
+		Where Not((Bo.StartDate < Bo.EndDate) and ( (Bo.EndDate < @startDate) or (Bo.StartDate > @endDate )))
+        )
+        select Distinct Rt.Id, Rt.Title, Rt.[Description], Rt.Price from AvailableRooms A 
+                        left join dbo.Rooms R on A.Id = R.Id 
+                        left join dbo.RoomTypes RT on RT.Id = R.RoomTypeId;
 
 End

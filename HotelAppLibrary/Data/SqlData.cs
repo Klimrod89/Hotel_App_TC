@@ -20,4 +20,6 @@ internal class SqlData
     {
         return db.LoadData<RoomTypeModel, dynamic>("dbo.RoomTypes_GetAvailableTypes", new {startDate, endDate}, true);
     }
+
+
 }
